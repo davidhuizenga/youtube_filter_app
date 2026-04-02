@@ -284,69 +284,68 @@
         <div class="empty">No videos found right now.</div>
     {% endif %}
 
-    <script>
-        const overlay = document.getElementById("introOverlay");
-        const enterBtn = document.getElementById("enterBtn");
-        const audio = document.getElementById("introAudio");
-        const countdownEl = document.getElementById("countdown");
+<script>
+    const overlay = document.getElementById("introOverlay");
+    const enterBtn = document.getElementById("enterBtn");
+    const audio = document.getElementById("introAudio");
+    const countdownEl = document.getElementById("countdown");
 
-        let timerStarted = false;
-        let timeLeft = 120;
-        let intervalId = null;
+    let timerStarted = false;
+    let timeLeft = 120;
+    let intervalId = null;
 
-        function startCountdown() {
-            if (timerStarted) return;
-            timerStarted = true;
+    function startCountdown() {
+        if (timerStarted) return;
+        timerStarted = true;
 
-            intervalId = setInterval(() => {
-                timeLeft -= 1;
-                countdownEl.textContent = timeLeft;
+        intervalId = setInterval(() => {
+            timeLeft -= 1;
+            countdownEl.textContent = timeLeft;
 
-                if (timeLeft <= 0) {
-                    clearInterval(intervalId);
+            if (timeLeft <= 0) {
+                clearInterval(intervalId);
+                if (audio) {
                     audio.pause();
                     audio.currentTime = 0;
-                    location.reload();
                 }
-            }, 1000);
+                location.reload();
+            }
+        }, 1000);
+    }
+
+    enterBtn.addEventListener("click", async () => {
+        try {
+            if (audio) {
+                await audio.play();
+            }
+        } catch (err) {
+            console.log("Audio could not start:", err);
         }
 
+        overlay.style.display = "none";
+        startCountdown();
+    });
+
     function playVideo(videoId, title, channel, views, published) {
-    const player = document.getElementById("youtubePlayer");
-    const playerTitle = document.getElementById("playerTitle");
-    const playerSub = document.getElementById("playerSub");
+        const player = document.getElementById("youtubePlayer");
+        const playerTitle = document.getElementById("playerTitle");
+        const playerSub = document.getElementById("playerSub");
 
-    if (!player) return;
+        if (!player) return;
 
-    player.src = "";
-    setTimeout(() => {
-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-    }, 50);
+        player.src = "";
+        setTimeout(() => {
+            player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+        }, 50);
 
-    playerTitle.textContent = title;
-    playerSub.textContent = `${channel} • ${views} views • ${published}`;
+        playerTitle.textContent = title;
+        playerSub.textContent = `${channel} • ${views} views • ${published}`;
 
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-
-    // FORCE update (this is the fix)
-    player.src = "";
-    setTimeout(() => {
-        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-    }, 50);
-
-    playerTitle.textContent = title;
-    playerSub.textContent = `${channel} • ${views} views • ${published}`;
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-}
-    </script>
-
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+</script>
 </body>
 </html>
