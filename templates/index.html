@@ -212,14 +212,38 @@
 <body>
 
     <div id="introOverlay">
-        <div class="introBox">
-            <div class="introTitle">Enter Live Feed</div>
-            <div class="introSubtitle">
-                Click below to enter the site, start the intro audio, and begin the 2-minute refresh cycle.
+       {% if videos %}
+    <div class="grid">
+        {% for video in videos %}
+            <div
+                class="card video-card"
+                data-video-id="{{ video.video_id }}"
+                data-title="{{ video.title }}"
+                data-channel="{{ video.channel }}"
+                data-views="{{ '{:,}'.format(video.views) }}"
+                data-published="{{ video.published }}"
+            >
+                <img src="{{ video.thumbnail }}" alt="Thumbnail for {{ video.title }}">
+                <div class="content">
+                    <div class="title">{{ video.title }}</div>
+                    <div class="meta">
+                        {{ video.channel }}<br>
+                        {{ "{:,}".format(video.views) }} views<br>
+                        {{ video.published }}
+                    </div>
+                    <div
+                        class="watch-link"
+                        onclick="event.stopPropagation(); window.open('{{ video.url }}', '_blank')"
+                    >
+                        Open on YouTube
+                    </div>
+                </div>
             </div>
-            <button id="enterBtn" type="button">Enter Site</button>
-            <div class="smallNote">Audio begins after click. Feed refreshes every 2 minutes.</div>
-        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty">No videos found right now.</div>
+{% endif %}
     </div>
 
     <h1>"hoe" Tube</h1>
@@ -284,76 +308,88 @@
         <div class="empty">No videos found right now.</div>
     {% endif %}
 
-    <script>
-        const overlay = document.getElementById("introOverlay");
-        const enterBtn = document.getElementById("enterBtn");
-        const audio = document.getElementById("introAudio");
-        const countdownEl = document.getElementById("countdown");
+<script>
+    const overlay = document.getElementById("introOverlay");
+    const enterBtn = document.getElementById("enterBtn");
+    const audio = document.getElementById("introAudio");
+    const countdownEl = document.getElementById("countdown");
 
-        let timerStarted = false;
-        let timeLeft = 120;
-        let intervalId = null;
+    let timerStarted = false;
+    let timeLeft = 120;
+    let intervalId = null;
 
-        function startCountdown() {
-            if (timerStarted) return;
-            timerStarted = true;
+    function startCountdown() {
+        if (timerStarted) return;
+        timerStarted = true;
 
-            intervalId = setInterval(() => {
-                timeLeft -= 1;
-                countdownEl.textContent = timeLeft;
+        intervalId = setInterval(() => {
+            timeLeft -= 1;
+            countdownEl.textContent = timeLeft;
 
-                if (timeLeft <= 0) {
-                    clearInterval(intervalId);
-                    if (audio) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                    }
-                    location.reload();
+            if (timeLeft <= 0) {
+                clearInterval(intervalId);
+                if (audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
                 }
-            }, 1000);
-        }
+                location.reload();
+            }
+        }, 1000);
+    }
 
-        if (enterBtn) {
-            enterBtn.addEventListener("click", async () => {
-                try {
-                    if (audio) {
-                        await audio.play();
-                    }
-                } catch (err) {
-                    console.log("Audio could not start:", err);
+    if (enterBtn) {
+        enterBtn.addEventListener("click", async () => {
+            try {
+                if (audio) {
+                    await audio.play();
                 }
-
-                if (overlay) {
-                    overlay.style.display = "none";
-                }
-
-                startCountdown();
-            });
-        }
-
-        function playVideo(videoId, title, channel, views, published) {
-            const player = document.getElementById("youtubePlayer");
-            const playerTitle = document.getElementById("playerTitle");
-            const playerSub = document.getElementById("playerSub");
-
-            if (!player) return;
-
-            player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-
-            if (playerTitle) {
-                playerTitle.textContent = title;
+            } catch (err) {
+                console.log("Audio could not start:", err);
             }
 
-            if (playerSub) {
-                playerSub.textContent = `${channel} • ${views} views • ${published}`;
+            if (overlay) {
+                overlay.style.display = "none";
             }
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
+            startCountdown();
+        });
+    }
+
+    function playVideo(videoId, title, channel, views, published) {
+        const player = document.getElementById("youtubePlayer");
+        const playerTitle = document.getElementById("playerTitle");
+        const playerSub = document.getElementById("playerSub");
+
+        if (!player) return;
+
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+
+        if (playerTitle) {
+            playerTitle.textContent = title;
         }
-    </script>
+
+        if (playerSub) {
+            playerSub.textContent = `${channel} • ${views} views • ${published}`;
+        }
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    }
+
+    document.querySelectorAll(".video-card").forEach(card => {
+        card.addEventListener("click", () => {
+            playVideo(
+                card.dataset.videoId,
+                card.dataset.title,
+                card.dataset.channel,
+                card.dataset.views,
+                card.dataset.published
+            );
+        });
+    });
+</script>
 
 </body>
 </html>
