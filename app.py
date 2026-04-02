@@ -14,43 +14,27 @@ SEARCH_URL = "https://www.googleapis.com/youtube/v3/search"
 VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 
 
-def get_recent_video_ids():
-    seven_days_ago = (datetime.utcnow() - timedelta(days=7)).isoformat("T") + "Z"
+function playVideo(videoId, title, channel, views, published) {
+    const player = document.getElementById("youtubePlayer");
+    const playerTitle = document.getElementById("playerTitle");
+    const playerSub = document.getElementById("playerSub");
 
-    params = {
-        "part": "snippet",
-        "q": "hoe",
-        "type": "video",
-        "order": "date",
-        "publishedAfter": seven_days_ago,
-        "maxResults": 50,
-        "key": API_KEY
-    }
+    if (!player) return;
 
-    response = requests.get(SEARCH_URL, params=params, timeout=20)
-    response.raise_for_status()
+    // FORCE update (this is the fix)
+    player.src = "";
+    setTimeout(() => {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }, 50);
 
-    data = response.json()
+    playerTitle.textContent = title;
+    playerSub.textContent = `${channel} • ${views} views • ${published}`;
 
-    video_ids = []
-    for item in data.get("items", []):
-        video_id = item.get("id", {}).get("videoId")
-        if video_id:
-            video_ids.append(video_id)
-
-    return video_ids
-
-
-def get_video_details(video_ids):
-    if not video_ids:
-        return []
-
-    params = {
-        "part": "snippet,statistics",
-        "id": ",".join(video_ids),
-        "key": API_KEY
-    }
-
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
     response = requests.get(VIDEOS_URL, params=params, timeout=20)
     response.raise_for_status()
 

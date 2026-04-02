@@ -217,7 +217,7 @@
             <div class="introSubtitle">
                 Click below to enter the site, start the intro audio, and begin the 2-minute refresh cycle.
             </div>
-            <button id="enterBtn">Enter Site</button>
+            <button id="enterBtn" type="button">Enter Site</button>
             <div class="smallNote">Audio begins after click. Feed refreshes every 2 minutes.</div>
         </div>
     </div>
@@ -260,7 +260,7 @@
             {% for video in videos %}
                 <div
                     class="card"
-                    onclick="event.preventDefault(); playVideo('{{ video.video_id }}', {{ video.title|tojson }}, {{ video.channel|tojson }}, {{ '{:,}'.format(video.views)|tojson }}, {{ video.published|tojson }})"
+                    onclick="playVideo('{{ video.video_id }}', {{ video.title|tojson }}, {{ video.channel|tojson }}, {{ '{:,}'.format(video.views)|tojson }}, {{ video.published|tojson }})"
                 >
                     <img src="{{ video.thumbnail }}" alt="Thumbnail for {{ video.title }}">
                     <div class="content">
@@ -284,68 +284,76 @@
         <div class="empty">No videos found right now.</div>
     {% endif %}
 
-<script>
-    const overlay = document.getElementById("introOverlay");
-    const enterBtn = document.getElementById("enterBtn");
-    const audio = document.getElementById("introAudio");
-    const countdownEl = document.getElementById("countdown");
+    <script>
+        const overlay = document.getElementById("introOverlay");
+        const enterBtn = document.getElementById("enterBtn");
+        const audio = document.getElementById("introAudio");
+        const countdownEl = document.getElementById("countdown");
 
-    let timerStarted = false;
-    let timeLeft = 120;
-    let intervalId = null;
+        let timerStarted = false;
+        let timeLeft = 120;
+        let intervalId = null;
 
-    function startCountdown() {
-        if (timerStarted) return;
-        timerStarted = true;
+        function startCountdown() {
+            if (timerStarted) return;
+            timerStarted = true;
 
-        intervalId = setInterval(() => {
-            timeLeft -= 1;
-            countdownEl.textContent = timeLeft;
+            intervalId = setInterval(() => {
+                timeLeft -= 1;
+                countdownEl.textContent = timeLeft;
 
-            if (timeLeft <= 0) {
-                clearInterval(intervalId);
-                if (audio) {
-                    audio.pause();
-                    audio.currentTime = 0;
+                if (timeLeft <= 0) {
+                    clearInterval(intervalId);
+                    if (audio) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                    }
+                    location.reload();
                 }
-                location.reload();
-            }
-        }, 1000);
-    }
-
-    enterBtn.addEventListener("click", async () => {
-        try {
-            if (audio) {
-                await audio.play();
-            }
-        } catch (err) {
-            console.log("Audio could not start:", err);
+            }, 1000);
         }
 
-        overlay.style.display = "none";
-        startCountdown();
-    });
+        if (enterBtn) {
+            enterBtn.addEventListener("click", async () => {
+                try {
+                    if (audio) {
+                        await audio.play();
+                    }
+                } catch (err) {
+                    console.log("Audio could not start:", err);
+                }
 
-    function playVideo(videoId, title, channel, views, published) {
-        const player = document.getElementById("youtubePlayer");
-        const playerTitle = document.getElementById("playerTitle");
-        const playerSub = document.getElementById("playerSub");
+                if (overlay) {
+                    overlay.style.display = "none";
+                }
 
-        if (!player) return;
+                startCountdown();
+            });
+        }
 
-        player.src = "";
-        setTimeout(() => {
+        function playVideo(videoId, title, channel, views, published) {
+            const player = document.getElementById("youtubePlayer");
+            const playerTitle = document.getElementById("playerTitle");
+            const playerSub = document.getElementById("playerSub");
+
+            if (!player) return;
+
             player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-        }, 50);
 
-        playerTitle.textContent = title;
-        playerSub.textContent = `${channel} • ${views} views • ${published}`;
+            if (playerTitle) {
+                playerTitle.textContent = title;
+            }
 
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
-    }
-</script>
+            if (playerSub) {
+                playerSub.textContent = `${channel} • ${views} views • ${published}`;
+            }
+
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+    </script>
+
 </body>
 </html>
