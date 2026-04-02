@@ -260,7 +260,7 @@
             {% for video in videos %}
                 <div
                     class="card"
-                    onclick="playVideo('{{ video.video_id }}', {{ video.title|tojson }}, {{ video.channel|tojson }}, {{ '{:,}'.format(video.views)|tojson }}, {{ video.published|tojson }})"
+                    onclick="event.preventDefault(); playVideo('{{ video.video_id }}', {{ video.title|tojson }}, {{ video.channel|tojson }}, {{ '{:,}'.format(video.views)|tojson }}, {{ video.published|tojson }})"
                 >
                     <img src="{{ video.thumbnail }}" alt="Thumbnail for {{ video.title }}">
                     <div class="content">
@@ -311,12 +311,26 @@
             }, 1000);
         }
 
-        function playVideo(videoId, title, channel, views, published) {
+    function playVideo(videoId, title, channel, views, published) {
     const player = document.getElementById("youtubePlayer");
     const playerTitle = document.getElementById("playerTitle");
     const playerSub = document.getElementById("playerSub");
 
     if (!player) return;
+
+    player.src = "";
+    setTimeout(() => {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }, 50);
+
+    playerTitle.textContent = title;
+    playerSub.textContent = `${channel} • ${views} views • ${published}`;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
 
     // FORCE update (this is the fix)
     player.src = "";
