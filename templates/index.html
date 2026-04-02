@@ -311,34 +311,27 @@
             }, 1000);
         }
 
-        enterBtn.addEventListener("click", async () => {
-            try {
-                await audio.play();
-            } catch (err) {
-                console.log("Audio could not start:", err);
-            }
-
-            overlay.style.display = "none";
-            startCountdown();
-        });
-
         function playVideo(videoId, title, channel, views, published) {
-            const player = document.getElementById("youtubePlayer");
-            const playerTitle = document.getElementById("playerTitle");
-            const playerSub = document.getElementById("playerSub");
+    const player = document.getElementById("youtubePlayer");
+    const playerTitle = document.getElementById("playerTitle");
+    const playerSub = document.getElementById("playerSub");
 
-            if (!player) return;
+    if (!player) return;
 
-            player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    // FORCE update (this is the fix)
+    player.src = "";
+    setTimeout(() => {
+        player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+    }, 50);
 
-            playerTitle.textContent = title;
-            playerSub.textContent = `${channel} • ${views} views • ${published}`;
+    playerTitle.textContent = title;
+    playerSub.textContent = `${channel} • ${views} views • ${published}`;
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        }
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+}
     </script>
 
 </body>
