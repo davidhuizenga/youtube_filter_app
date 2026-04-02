@@ -38,50 +38,6 @@
             padding: 10px 20px 20px;
         }
 
-        .featured-section {
-            max-width: 1100px;
-            margin: 0 auto 30px;
-            padding: 0 20px;
-        }
-
-        .featured-box {
-            background: #151515;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
-        }
-
-        .featured-frame-wrap {
-            position: relative;
-            width: 100%;
-            padding-top: 56.25%;
-            background: black;
-        }
-
-        .featured-frame-wrap iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .featured-meta {
-            padding: 16px;
-        }
-
-        .featured-title {
-            font-size: 1.25rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
-        .featured-sub {
-            color: #b5b5b5;
-            font-size: 0.95rem;
-            line-height: 1.5;
-        }
-
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -198,7 +154,6 @@
             font-size: 0.9rem;
         }
 
-        /* Fullscreen player overlay */
         #videoModal {
             position: fixed;
             inset: 0;
@@ -311,26 +266,6 @@
         <p class="error">{{ error }}</p>
     {% endif %}
 
-    {% if featured_video_id %}
-    <div class="featured-section">
-        <div class="featured-box">
-            <div class="featured-frame-wrap">
-                <iframe
-                    id="youtubePlayer"
-                    src="https://www.youtube.com/embed/{{ featured_video_id }}"
-                    title="Embedded YouTube player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen>
-                </iframe>
-            </div>
-            <div class="featured-meta">
-                <div class="featured-title" id="playerTitle">Now Playing</div>
-                <div class="featured-sub" id="playerSub">Tap any video below to open it here.</div>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-
     {% if videos %}
         <div class="grid">
             {% for video in videos %}
@@ -433,10 +368,8 @@
         function openVideo(videoId, title, channel, views, published) {
             stopIntroMusic();
 
-            const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
-
             if (modalPlayer) {
-                modalPlayer.src = embedUrl;
+                modalPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
             }
 
             if (modalTitle) {
@@ -449,22 +382,6 @@
 
             if (modal) {
                 modal.classList.add("open");
-            }
-
-            const player = document.getElementById("youtubePlayer");
-            const playerTitle = document.getElementById("playerTitle");
-            const playerSub = document.getElementById("playerSub");
-
-            if (player) {
-                player.src = embedUrl;
-            }
-
-            if (playerTitle) {
-                playerTitle.textContent = title;
-            }
-
-            if (playerSub) {
-                playerSub.textContent = `${channel} • ${views} views • ${published}`;
             }
         }
 
